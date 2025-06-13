@@ -322,7 +322,7 @@ export default {
                         return Response.json(
                             {
                                 success: false,
-                                message: "配置值不能为空",
+                                message: "配置值必须提供，可以为空字符串",
                             },
                             { status: 400 }
                         );
@@ -370,7 +370,7 @@ export default {
                     }
 
                     const result = await api.importData(data as ExportData);
-                    return Response.json({ success: result });
+                    return Response.json(result);
                 }
 
                 // 默认返回404
@@ -400,6 +400,7 @@ interface Env {
 interface LoginInput {
     username?: string;
     password?: string;
+    rememberMe?: boolean;
 }
 
 interface GroupInput {
@@ -431,6 +432,10 @@ function validateLogin(data: LoginInput): { valid: boolean; errors?: string[] } 
 
     if (!data.password || typeof data.password !== "string") {
         errors.push("密码不能为空且必须是字符串");
+    }
+
+    if (data.rememberMe !== undefined && typeof data.rememberMe !== "boolean") {
+        errors.push("记住我选项必须是布尔值");
     }
 
     return { valid: errors.length === 0, errors };
@@ -550,8 +555,8 @@ function validateSite(data: SiteInput): {
 function validateConfig(data: ConfigInput): { valid: boolean; errors?: string[] } {
     const errors: string[] = [];
 
-    if (!data.value || typeof data.value !== "string") {
-        errors.push("配置值不能为空且必须是字符串");
+    if (data.value === undefined || typeof data.value !== "string") {
+        errors.push("配置值必须是字符串类型");
     }
 
     return { valid: errors.length === 0, errors };
